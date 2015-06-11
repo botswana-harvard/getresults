@@ -2,33 +2,46 @@ from django.db import models
 
 from simple_history.models import HistoricalRecords
 
+from .export_mixin import ExportMixin
 from .panel import Panel
-# from .import_history import ImportHistory
-# from .export_history import ExportHistory
+from .order import Order
+from .validation_mixin import ValidationMixin
 
 
-class Result(models.Model):
+class Result(ExportMixin, ValidationMixin, models.Model):
 
     result_identifier = models.CharField(
-        max_length=25)
+        max_length=25,
+        null=True)
 
-    collection_datetime = models.DateTimeField()
+    order = models.ForeignKey(Order)
 
-    panel = models.ForeignKey(Panel)
+    specimen_identifier = models.CharField(
+        max_length=25,
+        null=True)
+
+    collection_datetime = models.DateTimeField(null=True)
+
+    status = models.CharField(
+        max_length=1,
+        null=True)
 
     analyzer_name = models.CharField(
-        max_length=25)
+        max_length=25,
+        null=True)
 
     analyzer_sn = models.CharField(
-        max_length=25)
+        max_length=25,
+        null=True)
 
     operator = models.CharField(
-        max_length=25)
+        max_length=25,
+        null=True)
 
     history = HistoricalRecords()
 
     def __str__(self):
-        return '{}: {}'.format(self.result_identifier, str(self.panel))
+        return '{}: {}'.format(self.result_identifier, str(self.order))
 
     class _Meta:
         app_label = 'getresults'

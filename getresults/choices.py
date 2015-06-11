@@ -9,8 +9,8 @@ VALUE_DATATYPES = (
     ('decimal', 'decimal'),
 )
 
-VALIDATION_CHOICES = (
-    ('accept', 'Accept'),
-    ('reject', 'Reject'),
+VALIDATION_OPTIONS = (
+    ('A', 'Accept'),
+    ('R', 'Reject'),
     (None, 'Do nothing'),
 )

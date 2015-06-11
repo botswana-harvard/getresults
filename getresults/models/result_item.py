@@ -2,13 +2,12 @@ from django.db import models
 
 from simple_history.models import HistoricalRecords
 
-from ..choices import VALIDATION_CHOICES
-
 from .result import Result
 from .utestid import Utestid
+from .validation_mixin import ValidationMixin
 
 
-class ResultItem(models.Model):
+class ResultItem(ValidationMixin, models.Model):
 
     result = models.ForeignKey(Result)
 
@@ -21,21 +20,6 @@ class ResultItem(models.Model):
         max_length=3)
 
     result_datetime = models.DateTimeField()
-
-    validation = models.CharField(
-        max_length=25,
-        choices=VALIDATION_CHOICES,
-        null=True,
-        blank=True)
-
-    validation_operator = models.CharField(
-        max_length=25,
-        null=True,
-        blank=True)
-
-    validation_datetime = models.DateTimeField(
-        null=True,
-        blank=True)
 
     history = HistoricalRecords()
 

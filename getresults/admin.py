@@ -4,15 +4,15 @@ from .models import Result, ResultItem, Panel, PanelItem, Utestid
 
 
 class ResultAdmin(admin.ModelAdmin):
-    list_display = ('result_identifier', 'collection_datetime', 'panel',
+    list_display = ('result_identifier', 'collection_datetime', 'order',
                     'operator', 'analyzer_name')
-    search_fields = ('result_identifier', 'source')
+    search_fields = ('result_identifier', 'source', 'order__order_identifier')
 admin.site.register(Result, ResultAdmin)
 
 
 class ResultItemAdmin(admin.ModelAdmin):
     list_display = ('result', 'utestid', 'value', 'quantifier', 'result_datetime')
-    search_fields = ('result__result_identifier', 'result__panel__name',
+    search_fields = ('result__result_identifier', 'result__order__panel__name',
                      'result_datetime')
 admin.site.register(ResultItem, ResultItemAdmin)
 

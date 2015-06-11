@@ -1,3 +1,4 @@
+from .order import Order
 from .panel import Panel
 from .panel_item import PanelItem
 from .result import Result
