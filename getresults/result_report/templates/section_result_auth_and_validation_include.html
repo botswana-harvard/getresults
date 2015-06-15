@@ -1,0 +1,16 @@
+{% load common_tags%}{% load userprofile_tags%}
+
+<table width="700">
+{% if result.release_datetime %}
+    <tr><td>Authorised and released by: {{ result.release_username|salutation }}{{ result.release_username|user_full_name }} on {{ result.release_datetime|date:"Y-m-d H:i" }}</td></tr>
+{% else %}    
+    <tr><td>Authorised and released by: <i>THIS RESULT IS NOT AUTHORIZED FOR RELEASE</i></td></tr>
+{% endif %}
+<tr><td width=50% valign="top">
+Comment: HI/LO: relative to BHP Normal Ranges dated 2010-05-01.<br>
+G1-4 (Grade per DAIDS 2004 Toxicity Tables: Aug 2009 Clarification memo).<br>
+{{ result.comment|escape|wordwrap:50 }} 
+</td></tr>
+</table>
+
+

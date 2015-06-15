@@ -1,0 +1,36 @@
+{% load common_tags %}
+{% load result_tags %}
+{% load reference_tags %}
+{% load grading_tags %}
+<h5>History</h5>
+<div class="results">
+  <table width="700" cellspacing="0" cellpadding="2" id="result_list" border='1'>
+    <thead>
+    <th>Test</th>
+    <th>Result</th>
+    <th>Units</th>    
+    <th>Reference</th>
+    <th>Flags</th>
+    <th>Assay</th>
+    <th>Validation</th>
+    <th>Comment</th>
+    </thead>
+    <tbody>
+    {% for result_item in result_items %}
+
+    {% for item in result_item.history.all %}
+      <tr class="{% cycle 'row2' 'row1' %}">
+        <td><A href="/admin/{{ item.get_absolute_url }}">{{ item.test_code.code }}</A>:&nbsp;{{ item.test_code }} </td> 
+        <td>{{ item.result_item_quantifier|quantifier }}&nbsp;{{ item.result_item_value|roundup:item.test_code.display_decimal_places|hide_not_final:item.validation_status }}</td>
+        <td>{{ item.test_code.units }}</td>
+        <td>{{ item.test_code|lln:item|roundup:item.test_code.display_decimal_places }}&nbsp;-&nbsp;{{ item.test_code|uln:item|roundup:item.test_code.display_decimal_places }}</td>
+        <td>{{ item.validation_status|status_flag }}&nbsp;{{ item.result_item_value|grade_flag:item}}&nbsp;{{ item.result_item_value|reference_range_flag:item}}</td>
+        <td>{{ item.result_item_datetime|date:"Y-m-d" }}</td>                
+        <td>{{ item.validation_datetime|date:"Y-m-d"|filter_validation_by_status:item.validation_status }}&nbsp;{{ item.validation_username }}</td>                
+        <td>{{ item.comment }}</td>     
+      </tr>
+     {% endfor %}
+     {% endfor %}            
+  </tbody>
+  </table>
+  </div>

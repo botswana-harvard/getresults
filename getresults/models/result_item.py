@@ -2,12 +2,15 @@ from django.db import models
 
 from simple_history.models import HistoricalRecords
 
+from edc_base.model.models import BaseUuidModel
+
+from ..choices import RESULT_ITEM_STATUS
+
 from .result import Result
 from .utestid import Utestid
-from .validation_mixin import ValidationMixin
 
 
-class ResultItem(ValidationMixin, models.Model):
+class ResultItem(BaseUuidModel):
 
     result = models.ForeignKey(Result)
 
@@ -20,6 +23,14 @@ class ResultItem(ValidationMixin, models.Model):
         max_length=3)
 
     result_datetime = models.DateTimeField()
+
+    status = models.CharField(
+        max_length=10,
+        choices=RESULT_ITEM_STATUS)
+
+    validation_reference = models.CharField(
+        max_length=25,
+        null=True)
 
     history = HistoricalRecords()
 

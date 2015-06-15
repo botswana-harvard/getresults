@@ -1,0 +1,52 @@
+<div class="results">
+      <table cellspacing="0" id="result_list" border='1'>
+        <thead><tr>
+        <th>Subject</th>
+        <th>Consent</th>        
+        <th>Initials</th>        
+        <th>Dob</th>                
+        <th>Sample</th>
+        <th>Test</th>        
+        <th>Drawn</th>
+        <th>Received</th>        
+        <th>Utestid</th>
+        <th>*</th>
+        <th>Result</th>
+        <th>Hiv</th>              
+        <th>ART</th>              
+        <th>User Created</th>        
+        <th>Created</th>    	    	
+        <th>Modified</th>
+        <th>Imported</th>    	    	            	    	
+        </thead>
+        <tbody>
+      {% for obj in latest_results_list %}
+        
+            <tr class="{% cycle 'row2' 'row1' %}">
+            <td>{{obj.subject_identifier }}</td>
+            <td><A href="/admin{{obj.subject_consent.get_absolute_url}}">{{ obj.subject_consent.first_name }}</A></td>
+            <td>{{obj.initials }}</td>
+            <td>{{obj.dob|date:"Y-m-d"}}</td>            
+            <td><A href="/bhp_lab_result_report/{{obj.id }}">{{obj.sample_id }}</td>
+            <td>{{obj.test }}</td>                        
+            <td>{{obj.date_sample_drawn|date:"Y-m-d"}}</td>
+            <td>{{obj.received|date:"Y-m-d"}}</td>            
+            <td>{{obj.utestid|default:"" }}</td>            
+            <td>{{obj.result_quantifier|default:"" }}</td>                        
+            <td>
+                  {{ obj.result|default:"" }}
+            </td>            
+            <td><i>{{obj.subject_hiv_result.result_word.lower }}</i></td>                        
+            <td><i>{{obj.subject_art_history.art_status }}</i></td>                        
+            <td>{{obj.created|date:"Y-m-d"}}</td>            
+            <td>{{obj.modified|date:"Y-m-d"}}</td>            
+            <td>{{obj.user_created }}</td>                                    
+            <td>{{obj.import_date|date:"Y-m-d H:m" }}</td>
+            </tr>
+
+      {% endfor %}
+      <tr><td colspan="10">{{ latest_results_list.count }} lab{{ latest_results_list|pluralize }} found.</td></tr>                        
+      </tbody>
+      </table>
+      </div>
+

@@ -2,13 +2,12 @@ from django.db import models
 
 from simple_history.models import HistoricalRecords
 
-from .export_mixin import ExportMixin
-from .panel import Panel
+from edc_base.model.models import BaseUuidModel
+
 from .order import Order
-from .validation_mixin import ValidationMixin
 
 
-class Result(ExportMixin, ValidationMixin, models.Model):
+class Result(BaseUuidModel):
 
     result_identifier = models.CharField(
         max_length=25,
@@ -37,6 +36,14 @@ class Result(ExportMixin, ValidationMixin, models.Model):
     operator = models.CharField(
         max_length=25,
         null=True)
+
+    validation_reference = models.CharField(
+        max_length=25,
+        null=True)
+
+    last_exported = models.BooleanField(default=False)
+
+    last_exported_datetime = models.DateTimeField(null=True)
 
     history = HistoricalRecords()
 

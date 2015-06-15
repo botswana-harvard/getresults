@@ -1,9 +1,13 @@
 from django.db import models
 
+from edc_base.model.models import BaseUuidModel
+
+from getresults_aliquot.models import Aliquot
+
 from .panel import Panel
 
 
-class Order(models.Model):
+class Order(BaseUuidModel):
 
     order_identifier = models.CharField(
         max_length=50,
@@ -14,9 +18,19 @@ class Order(models.Model):
 
     panel = models.ForeignKey(Panel)
 
+    aliquot = models.ForeignKey(Aliquot)
+
     specimen_identifier = models.CharField(
         max_length=50,
     )
+
+    action_code = models.CharField(
+        max_length=1,
+        null=True)
+
+    report_type = models.CharField(
+        max_length=1,
+        null=True)
 
     def __str__(self):
         return '{}: {}'.format(self.order_identifier, self.panel)

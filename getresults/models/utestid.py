@@ -57,8 +57,14 @@ class Utestid(models.Model):
         help_text='formula is based on the value of this utestid'
     )
 
+    units = models.CharField(
+        max_length=10,
+        null=True
+    )
+
     def __str__(self):
         return self.name
 
     class Meta:
         app_label = 'getresults'
+        ordering = ('name', )

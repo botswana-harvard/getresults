@@ -1,0 +1,15 @@
+{% extends "section_result.html" %}
+
+{% block single_search_result %}
+
+    {% block result %}
+
+        {% if result %}
+
+            {% include "result_report_single.html" %}
+            
+        {% endif %}
+        
+    {% endblock %}
+
+{% endblock%}

@@ -1,0 +1,23 @@
+{% load common_tags %}{% load result_tags %}
+<table width="700" cellspacing="0" cellpadding="2" id="result_list" border='1'>
+<thead>
+<th colspan="2">Aliquot</th> 
+<th>OrderID</th> 
+<th>Order Date</th>   	    	
+<th>ResultID</th> 
+<th>Result Datetime</th>
+<th>Release Datetime / Status</th>
+
+</thead>
+<tbody>
+<tr>
+     <td colspan="2">{{ aliquot_identifier }}</td>                    
+     <td>{{ order_identifier }}</td>
+	 <td>{{ order_datetime|date:"Y-m-d" }}</td>
+     <td>{{ result.result_identifier }}</td>
+     <td>{{ result.result_datetime|date:"Y-m-d H:i" }}</td>
+     <td>{{ result.release_datetime|date:"Y-m-d H:i" }} {{result.release_username|user_initials }}&nbsp; {{ result.release_status|lower }}</td>                            
+    </tr>
+</tbody>    
+</table>
+

@@ -1,0 +1,37 @@
+<table >
+    <thead><th>Result Search</th></thead>
+    <tbody>
+    <tr>
+    <td>
+        <form action="." method="POST">
+            <div style='display:none'>  
+              {% csrf_token %}
+            </div>
+            <table>
+            <tr>
+            {% for field in form %}
+                <div class="fieldWrapper">
+                    <td>{{ field.label}}</td>
+                </div>
+            {% endfor %}
+            </tr><tr>                
+            {% for field in form %}
+                <div class="fieldWrapper">
+                    <td>{{ field }} {{ field.errors }}</td>
+                </div>
+            {% endfor %}
+            <td>
+            <input type="submit" value="Search" class="default" name="search" />
+            </td>
+            <script type="text/javascript">document.getElementById("id_panel").focus();</script>
+            <script type="text/javascript">
+                (function($) {
+                    var field = null;
+                })(django.jQuery);
+            </script>
+            </table>
+        </form>
+    </td>
+    </tbody>
+</table>
+

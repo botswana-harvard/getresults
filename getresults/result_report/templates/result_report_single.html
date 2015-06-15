@@ -1,0 +1,10 @@
+<table>
+    <tr>
+        <td>
+            <center><h5>{{ panel_name }} for {{ subject_identifier }} collected {{ drawn_datetime|date:"Y-m-d" }}</h5></center>
+            <center><font color="red">{% if result.order.get_status_message %}{{ result.order.get_status_message }}{% endif %}</font></center>
+            {% include "section_result_all.html" %}
+        </td>
+    </tr>
+</table>
+
