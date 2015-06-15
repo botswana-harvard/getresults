@@ -40,7 +40,7 @@ class PanelItem(models.Model):
         elif self.utestid.value_datatype == 'decimal':
             return round(float(raw_value), self.utestid.precision)
         else:
-            raise ValueError('Attribute value_type may not be None')
+            raise ValueError('Invalid utestid.value_type. Got \'{}\''.format(value_type))
         return None
 
     def calculated_value(self, raw_value):

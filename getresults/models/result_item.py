@@ -17,16 +17,20 @@ class ResultItem(BaseUuidModel):
     utestid = models.ForeignKey(Utestid)
 
     value = models.CharField(
-        max_length=25)
+        max_length=25,
+        null=True)
 
     quantifier = models.CharField(
-        max_length=3)
+        max_length=3,
+        null=True)
 
-    result_datetime = models.DateTimeField()
+    result_datetime = models.DateTimeField(
+        null=True)
 
     status = models.CharField(
         max_length=10,
-        choices=RESULT_ITEM_STATUS)
+        choices=RESULT_ITEM_STATUS,
+        null=True)
 
     validation_reference = models.CharField(
         max_length=25,
