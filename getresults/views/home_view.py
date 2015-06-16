@@ -8,5 +8,9 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
         context.update(
             title="LIMS",
+            receive_description="Receive samples",
+            order_description="Order test",
+            validate_description='Validate Results',
+            result_description='View Results',
         )
         return context
