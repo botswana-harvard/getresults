@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from ..models import Result, ResultItem, Panel, PanelItem, Utestid, Order
+from ..models import Result, ResultItem, Panel, PanelItem, Utestid, Order, Sender, UtestidMapping
 
 
 class ResultItemInline(admin.TabularInline):
@@ -58,3 +58,15 @@ class OrderAdmin(admin.ModelAdmin):
 
     inlines = [ResultInline, ]
 admin.site.register(Order, OrderAdmin)
+
+
+class SenderAdmin(admin.ModelAdmin):
+    list_display = ('name', 'description')
+    search_fields = ('name', 'description')
+admin.site.register(Sender, SenderAdmin)
+
+
+class UtestidMappingAdmin(admin.ModelAdmin):
+    list_display = ('sender', 'utestid', 'utestid_name')
+    search_fields = ('sender_name', 'utestid_name', 'utestid__name')
+admin.site.register(UtestidMapping, UtestidMappingAdmin)

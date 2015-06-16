@@ -3,11 +3,16 @@ from django.db import models
 from edc_base.model.models import BaseUuidModel, HistoricalRecords
 
 
-class Panel(BaseUuidModel):
+class Sender(BaseUuidModel):
 
     name = models.CharField(
-        max_length=50,
+        max_length=25,
         unique=True
+    )
+
+    description = models.CharField(
+        max_length=100,
+        null=True
     )
 
     history = HistoricalRecords()
@@ -17,4 +22,5 @@ class Panel(BaseUuidModel):
 
     class Meta:
         app_label = 'getresults'
+        db_table = 'getresults_sender'
         ordering = ('name', )
