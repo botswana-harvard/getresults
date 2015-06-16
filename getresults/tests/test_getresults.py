@@ -31,7 +31,7 @@ class TestGetresult(TestCase):
         panel_item = PanelItem.objects.create(
             panel=panel,
             utestid=utestid)
-        value = panel_item.value('POS')
+        value = panel_item.utestid.value('POS')
         self.assertEquals(value, 'POS')
 
     def test_panel_item_integer(self):
@@ -46,7 +46,7 @@ class TestGetresult(TestCase):
             panel=panel,
             utestid=utestid,
         )
-        value = panel_item.value(100.99)
+        value = panel_item.utestid.value(100.99)
         self.assertEquals(value, 101)
 
     def test_panel_item_decimal(self):
@@ -60,7 +60,7 @@ class TestGetresult(TestCase):
         panel_item = PanelItem.objects.create(
             panel=panel,
             utestid=utestid)
-        value = panel_item.value(100.77)
+        value = panel_item.utestid.value(100.77)
         self.assertEquals(value, 100.8)
 
     def test_panel_item_calc(self):
@@ -75,7 +75,7 @@ class TestGetresult(TestCase):
         panel_item = PanelItem.objects.create(
             panel=panel,
             utestid=utestid)
-        value = panel_item.value(750000)
+        value = panel_item.utestid.value(750000)
         self.assertEquals(value, round(math.log10(750000), 2))
 
     def test_panel_item_formula(self):
@@ -90,7 +90,7 @@ class TestGetresult(TestCase):
             panel=panel,
             utestid=utestid,
         )
-        self.assertRaises(ValueError, panel_item.value, 750000)
+        self.assertRaises(ValueError, panel_item.utestid.value, 750000)
 
     def test_panel_item_quantifier_eq(self):
         panel = Panel.objects.create(name='viral load')
@@ -102,7 +102,7 @@ class TestGetresult(TestCase):
             panel=panel,
             utestid=utestid
         )
-        value_with_quantifier = panel_item.value_with_quantifier(1000)
+        value_with_quantifier = panel_item.utestid.value_with_quantifier(1000)
         self.assertEquals(value_with_quantifier, ('=', 1000))
 
     def test_panel_item_quantifier_lt(self):
@@ -116,9 +116,9 @@ class TestGetresult(TestCase):
         panel_item = PanelItem.objects.create(
             panel=panel,
             utestid=utestid)
-        value_with_quantifier = panel_item.value_with_quantifier(400)
+        value_with_quantifier = panel_item.utestid.value_with_quantifier(400)
         self.assertEquals(value_with_quantifier, ('=', 400))
-        value_with_quantifier = panel_item.value_with_quantifier(399)
+        value_with_quantifier = panel_item.utestid.value_with_quantifier(399)
         self.assertEquals(value_with_quantifier, ('<', 400))
 
     def test_panel_item_quantifier_gt(self):
@@ -132,7 +132,7 @@ class TestGetresult(TestCase):
         panel_item = PanelItem.objects.create(
             panel=panel,
             utestid=utestid)
-        value_with_quantifier = panel_item.value_with_quantifier(750000)
+        value_with_quantifier = panel_item.utestid.value_with_quantifier(750000)
         self.assertEquals(value_with_quantifier, ('=', 750000))
-        value_with_quantifier = panel_item.value_with_quantifier(750001)
+        value_with_quantifier = panel_item.utestid.value_with_quantifier(750001)
         self.assertEquals(value_with_quantifier, ('>', 750000))
