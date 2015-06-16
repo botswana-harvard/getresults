@@ -1,6 +1,6 @@
 from django.db import models
 
-from edc_base.model.models import BaseUuidModel
+from edc_base.model.models import BaseUuidModel, HistoricalRecords
 
 from getresults_aliquot.models import Aliquot
 
@@ -31,6 +31,8 @@ class Order(BaseUuidModel):
     report_type = models.CharField(
         max_length=1,
         null=True)
+
+    history = HistoricalRecords()
 
     def __str__(self):
         return '{}: {}'.format(self.order_identifier, self.panel)

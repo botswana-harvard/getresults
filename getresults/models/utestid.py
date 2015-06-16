@@ -1,9 +1,11 @@
 from django.db import models
 
+from edc_base.model.models import BaseUuidModel, HistoricalRecords
+
 from ..choices import VALUE_DATATYPES, VALUE_TYPES
 
 
-class Utestid(models.Model):
+class Utestid(BaseUuidModel):
 
     name = models.CharField(
         max_length=10,
@@ -61,6 +63,8 @@ class Utestid(models.Model):
         max_length=10,
         null=True
     )
+
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.name

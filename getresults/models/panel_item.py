@@ -4,11 +4,13 @@ from math import log10
 
 from django.db import models
 
+from edc_base.model.models import BaseUuidModel, HistoricalRecords
+
 from .panel import Panel
 from .utestid import Utestid
 
 
-class PanelItem(models.Model):
+class PanelItem(BaseUuidModel):
     """Model that represents one item in a panel.
 
     Has methods to format absolute values and to calculate, then format,
@@ -25,6 +27,8 @@ class PanelItem(models.Model):
 
     utestid = models.ForeignKey(Utestid)
 
+    history = HistoricalRecords()
+    
     def __str__(self):
         return '{}: {}'.format(self.utestid.name, self.panel.name)
 
