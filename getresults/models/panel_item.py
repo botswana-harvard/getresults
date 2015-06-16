@@ -28,7 +28,7 @@ class PanelItem(BaseUuidModel):
     utestid = models.ForeignKey(Utestid)
 
     history = HistoricalRecords()
-    
+
     def __str__(self):
         return '{}: {}'.format(self.utestid.name, self.panel.name)
 
