@@ -16,13 +16,13 @@ Including another URLconf
 
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from django.views.generic.base import TemplateView
 
 from .views import HomeView
 
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     url(r'^$', HomeView.as_view()),
     url(r'^admin/', include(admin.site.urls)),
 )
