@@ -3,7 +3,7 @@ from django.test import TestCase
 
 from ..models import Panel, PanelItem, Utestid
 from ..utils import (
-    load_panel_items_from_csv, load_utestids_from_csv, load_panels_from_csv
+    load_panel_items_from_csv, load_utestids_from_csv, load_panels_from_csv, load_utestidmappings_from_csv
 )
 
 
@@ -14,6 +14,7 @@ class TestGetresult(TestCase):
         load_panels_from_csv()
         load_utestids_from_csv()
         load_panel_items_from_csv()
+        load_utestidmappings_from_csv()
 
     def test_load(self):
         """Assert correct number of records created based on testdata."""

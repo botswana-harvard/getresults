@@ -15,6 +15,8 @@ tz = pytz.timezone(settings.TIME_ZONE)
 
 class GetResultsDispatcherMixin(object):
 
+    create_dummy_records = False
+
     def sender(self, sender_name, sender_description):
         try:
             sender = Sender.objects.get(name=sender_name)
@@ -119,24 +121,31 @@ class GetResultsDispatcherMixin(object):
             )
         return result
 
-    def utestid(self, sender_utestid_name, sender):
+    def utestid_mapping(self, sender_utestid_name, sender, panel_name):
         try:
             utestid_mapping = UtestidMapping.objects.get(
-                sender_utestid_name=sender_utestid_name, sender=sender)
-            utestid = utestid_mapping.utestid
+                panel__name=panel_name,
+                sender_utestid_name=sender_utestid_name,
+                sender=sender)
         except UtestidMapping.DoesNotExist:
-            try:
-                utestid = Utestid.objects.get(name=sender_utestid_name)
-            except Utestid.DoesNotExist:
-                utestid = Utestid.objects.create(
-                    name=sender_utestid_name,
-                    value_type='absolute',
-                    value_datatype='string',
-                    description='unknown from interface')
+            utestid = self.utestid(sender_utestid_name)
+            panel = self.panel(panel_name)
             utestid_mapping = UtestidMapping.objects.create(
                 utestid=utestid,
                 sender_utestid_name=sender_utestid_name,
-                sender=sender)
+                sender=sender,
+                panel=panel)
+        return utestid_mapping
+
+    def utestid(self, name):
+        try:
+            utestid = Utestid.objects.get(name=name)
+        except Utestid.DoesNotExist:
+            utestid = Utestid.objects.create(
+                name=name,
+                value_type='absolute',
+                value_datatype='string',
+                description='unknown from interface')
         return utestid
 
     def panel_item(self, panel, utestid):
@@ -152,7 +161,7 @@ class GetResultsDispatcherMixin(object):
             )
         return panel_item
 
-    def result_item(self, result, utestid, panel_item, result_record):
+    def result_item(self, result, utestid, result_record):
         try:
             result_item = ResultItem.objects.get(
                 result=result,
@@ -162,12 +171,16 @@ class GetResultsDispatcherMixin(object):
         result_item.result = result
         result_item.utestid = utestid
         result_item.specimen_identifier = result.specimen_identifier
+        result_item.status = result_record.status
+        result_item.operator = result_record.operator
+        result_item.quantifier, result_item.value = utestid.value_with_quantifier(result_record.value)
+        result_item.raw_value = result_record.value
         try:
-            result_item.status = result_record.status
-            result_item.operator = result_record.operator
-            result_item.quantifier, result_item.value = panel_item.utestid.value_with_quantifier(result_record.value)
             result_item.result_datetime = tz.localize(result_record.completed_at)
-        except AttributeError:
-            pass
+        except ValueError as e:
+            if 'Not naive datetime' in str(e):
+                result_item.result_datetime = result_record.completed_at
+            else:
+                raise
         result_item.save()
         return result_item

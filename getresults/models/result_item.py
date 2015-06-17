@@ -18,6 +18,10 @@ class ResultItem(BaseUuidModel):
         max_length=25,
         null=True)
 
+    raw_value = models.CharField(
+        max_length=25,
+        null=True)
+
     quantifier = models.CharField(
         max_length=3,
         null=True)
@@ -33,6 +37,16 @@ class ResultItem(BaseUuidModel):
     validation_reference = models.CharField(
         max_length=25,
         null=True)
+
+    sender = models.CharField(
+        max_length=25,
+        null=True,
+        help_text='analyzer or instrument')
+
+    source = models.CharField(
+        max_length=25,
+        null=True,
+        help_text='For example, \'filename\' for CSV or \'ASTM\'')
 
     history = HistoricalRecords()
 

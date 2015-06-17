@@ -1,6 +1,6 @@
 from django.db import models
 
-from getresults.models import Utestid
+from getresults.models import Utestid, Panel
 from edc_base.model.models import BaseUuidModel, HistoricalRecords
 
 from .sender import Sender
@@ -9,6 +9,8 @@ from .sender import Sender
 class UtestidMapping(BaseUuidModel):
 
     sender = models.ForeignKey(Sender)
+
+    panel = models.ForeignKey(Panel)
 
     utestid = models.ForeignKey(Utestid)
 
