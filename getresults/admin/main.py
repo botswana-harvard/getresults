@@ -67,6 +67,6 @@ admin.site.register(Sender, SenderAdmin)
 
 
 class UtestidMappingAdmin(admin.ModelAdmin):
-    list_display = ('sender', 'utestid', 'utestid_name')
-    search_fields = ('sender_name', 'utestid_name', 'utestid__name')
+    list_display = ('sender', 'sender_utestid_name', 'utestid')
+    search_fields = ('sender__name', 'sender_utestid_name', 'utestid__name')
 admin.site.register(UtestidMapping, UtestidMappingAdmin)
