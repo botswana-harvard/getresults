@@ -6,16 +6,81 @@ from django.conf import settings
 from django.utils import timezone
 
 from getresults_aliquot.models import AliquotType, Aliquot, AliquotCondition
+from getresults_astm.dispatchers import Dispatcher
 from getresults_receive.models import Patient, Receive
 
-from .models import Panel, PanelItem, Order, Result, ResultItem, Utestid, UtestidMapping, Sender
+from ..models import Panel, PanelItem, Order, Result, ResultItem, Utestid, UtestidMapping, Sender
 
 tz = pytz.timezone(settings.TIME_ZONE)
 
 
-class GetResultsDispatcherMixin(object):
+class GetResultsDispatcher(Dispatcher):
 
-    create_dummy_records = False
+    """Dispatches data to the getresults DB coming in from analyzers/Roche PSM.
+
+    Missing data items, such as UTESTID's, can be created on the fly to avoid disruption
+    in data flow. However creating fake orders, aliquots, receive records and patient
+    records is not ideal.
+
+    Unless the dispatcher class attribute create_dummy_data=True, missing data items in
+    the receiving database will cause an exception.
+    """
+
+    create_dummy_records = False  # if True create dummy patient, receive, aliquot and order
+
+    def save_to_db(self, records):
+        try:
+            header_record = records['H']
+            sender = self.sender(
+                header_record.sender.name,
+                ', '.join([s for s in header_record.sender])
+            )
+            patient_record = records['P']
+            patient = self.patient(
+                patient_record.practice_id,
+                gender=patient_record.sex,
+                dob=patient_record.birthdate,
+                registration_datetime=patient_record.admission_date,
+            )
+            if records['O']:
+                order_record = records['O']
+                panel = self.panel(order_record.test)
+                order = self.order(
+                    order_record.sample_id,
+                    order_record.created_at,
+                    order_record.action_code,
+                    order_record.report_type,
+                    panel,
+                    patient)
+                if records['R']:
+                    result_records = records['R']
+                    result = None
+                    for result_record in result_records:
+                        if not result:
+                            result = self.result(
+                                order,
+                                order_record.sample_id,
+                                result_record.operator.name,
+                                result_record.status,
+                                result_record.instrument,
+                            )
+                        utestid_mapping = self.utestid_mapping(result_record.test, sender, panel.name)
+                        utestid = utestid_mapping.utestid
+                        panel_item = self.panel_item(panel, utestid)
+                        self.result_item(result, utestid, result_record)
+                    # add in missing utestid's
+                    utestid_names = [p.utestid.name for p in PanelItem.objects.filter(panel=panel)]
+                    result_utestid_names = [r.utestid.name for r in ResultItem.objects.filter(result=result)]
+                    for name in utestid_names:
+                        if name not in result_utestid_names:
+                            utestid = Utestid.objects.get(name=name)
+                            panel_item = self.panel_item(panel, utestid)
+                            self.result_item(result, utestid, panel_item, None)
+        except AttributeError:
+            raise
+        except Exception:
+            # print(e)
+            raise
 
     def sender(self, sender_name, sender_description):
         try:

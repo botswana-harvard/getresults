@@ -1,0 +1,5 @@
+
+
+class GetResultsEmitter(object):
+
+    pass
