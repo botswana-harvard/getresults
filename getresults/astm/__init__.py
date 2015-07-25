@@ -1,2 +1,2 @@
 from .dispatchers import GetResultsDispatcher
-from .emitters import GetResultsEmitter
+from .emitters import emitter

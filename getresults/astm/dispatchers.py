@@ -6,7 +6,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from getresults_aliquot.models import AliquotType, Aliquot, AliquotCondition
-from getresults_astm.dispatchers import Dispatcher
+from getresults_astm.dispatcher import Dispatcher
 from getresults_receive.models import Patient, Receive
 
 from ..models import Panel, PanelItem, Order, Result, ResultItem, Utestid, UtestidMapping, Sender
@@ -28,6 +28,9 @@ class GetResultsDispatcher(Dispatcher):
 
     create_dummy_records = False  # if True create dummy patient, receive, aliquot and order
 
+    def new_record_event(self, records):
+        self.save_to_db(records)
+
     def save_to_db(self, records):
         try:
             header_record = records['H']
@@ -45,19 +48,22 @@ class GetResultsDispatcher(Dispatcher):
             if records['O']:
                 order_record = records['O']
                 panel = self.panel(order_record.test)
+                receive = self.receive(
+                    patient, order_record.sample_id, order_record.sampled_at, order_record.created_at)
                 order = self.order(
                     order_record.sample_id,
                     order_record.created_at,
                     order_record.action_code,
                     order_record.report_type,
                     panel,
-                    patient)
+                    receive)
                 if records['R']:
                     result_records = records['R']
                     result = None
                     for result_record in result_records:
                         if not result:
                             result = self.result(
+                                order_record.laboratory_field_1,
                                 order,
                                 order_record.sample_id,
                                 result_record.operator.name,
@@ -66,7 +72,7 @@ class GetResultsDispatcher(Dispatcher):
                             )
                         utestid_mapping = self.utestid_mapping(result_record.test, sender, panel.name)
                         utestid = utestid_mapping.utestid
-                        panel_item = self.panel_item(panel, utestid)
+                        self.panel_item(panel, utestid)
                         self.result_item(result, utestid, result_record)
                     # add in missing utestid's
                     utestid_names = [p.utestid.name for p in PanelItem.objects.filter(panel=panel)]
@@ -76,11 +82,10 @@ class GetResultsDispatcher(Dispatcher):
                             utestid = Utestid.objects.get(name=name)
                             panel_item = self.panel_item(panel, utestid)
                             self.result_item(result, utestid, panel_item, None)
-        except AttributeError:
-            raise
-        except Exception:
-            # print(e)
-            raise
+        except AttributeError as err:
+            print(str(err))
+        except Exception as err:
+            print(str(err))
 
     def sender(self, sender_name, sender_description):
         try:
@@ -112,13 +117,13 @@ class GetResultsDispatcher(Dispatcher):
             panel = Panel.objects.create(name=name)
         return panel
 
-    def order(self, order_identifier, order_datetime, action_code, report_type, panel, patient):
+    def order(self, order_identifier, order_datetime, action_code, report_type, panel, receive):
         try:
             order = Order.objects.get(order_identifier=order_identifier)
         except Order.DoesNotExist:
             order = None
             if self.create_dummy_records:
-                aliquot = self.aliquot(patient, None)
+                aliquot = self.aliquot(receive, order_identifier)
                 order = Order.objects.create(
                     order_identifier=order_identifier,
                     order_datetime=tz.localize(order_datetime),
@@ -129,16 +134,16 @@ class GetResultsDispatcher(Dispatcher):
                     aliquot=aliquot)
         return order
 
-    def aliquot(self, patient, order_identifier):
+    def aliquot(self, receive, order_identifier):
         """Creates a fake aliquot."""
         try:
             aliquot_type = AliquotType.objects.get(name='unknown')
         except AliquotType.DoesNotExist:
             aliquot_type = AliquotType.objects.create(name='unknown', numeric_code='00', alpha_code='00')
         try:
-            aliquot_condition = AliquotCondition.objects.get(name='unknown')
+            AliquotCondition.objects.get(name='unknown')
         except AliquotCondition.DoesNotExist:
-            aliquot_condition = AliquotCondition.objects.create(name='unknown', description='unknown')
+            AliquotCondition.objects.create(name='unknown', description='unknown')
         try:
             aliquot = Order.objects.get(
                 order_identifier=order_identifier
@@ -146,39 +151,33 @@ class GetResultsDispatcher(Dispatcher):
         except Order.DoesNotExist:
             aliquot = None
             if self.create_dummy_records:
-                aliquot_identifier = uuid4()
-                receive = self.receive(patient, aliquot_identifier)
-                aliquot = Aliquot.objects.create(
-                    aliquot_identifier=aliquot_identifier,
-                    aliquot_type=aliquot_type,
-                    aliquot_condition=aliquot_condition,
-                    receive=receive)
+                aliquot = Aliquot.objects.create_primary(receive, aliquot_type.numeric_code)
         return aliquot
 
-    def receive(self, patient, aliquot_identifier):
+    def receive(self, patient, receive_identifier, collection_datetime, receive_datetime):
         """Creates a fake receive record."""
         try:
-            Receive.objects.get(
-                patient=patient,
-                receive_identifier=aliquot_identifier,
+            receive = Receive.objects.get(
+                receive_identifier=receive_identifier,
             )
         except Receive.DoesNotExist:
             receive = None
             if self.create_dummy_records:
                 receive = Receive.objects.create(
-                    receive_identifier=uuid4(),
-                    receive_datetime=timezone.now(),
+                    receive_identifier=receive_identifier,
+                    collection_datetime=collection_datetime,
+                    receive_datetime=receive_datetime,
                     patient=patient
                 )
         return receive
 
-    def result(self, order, specimen_identifier, operator, status, instrument):
+    def result(self, result_identifier, order, specimen_identifier, operator, status, instrument):
         try:
             result = Result.objects.get(order=order)
         except Result.DoesNotExist:
             result = Result.objects.create(
                 order=order,
-                result_identifier=uuid4(),
+                result_identifier=result_identifier,
                 specimen_identifier=specimen_identifier,
                 status=status,
                 operator=operator,
@@ -238,7 +237,10 @@ class GetResultsDispatcher(Dispatcher):
         result_item.specimen_identifier = result.specimen_identifier
         result_item.status = result_record.status
         result_item.operator = result_record.operator
-        result_item.quantifier, result_item.value = utestid.value_with_quantifier(result_record.value)
+        if result_record.value[0] in '=<>':
+            result_item.quantifier, result_item.value = result_record.value[0], result_record.value[1:]
+        else:
+            result_item.quantifier, result_item.value = utestid.value_with_quantifier(result_record.value)
         result_item.raw_value = result_record.value
         try:
             result_item.result_datetime = tz.localize(result_record.completed_at)

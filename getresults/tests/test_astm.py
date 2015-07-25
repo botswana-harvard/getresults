@@ -10,11 +10,12 @@ from django.utils import timezone
 from astm import codec
 from astm.constants import ENCODING
 
-from getresults_astm.records import CommonOrder, CommonResult, CommonPatient, Header
+from getresults_astm.records import CommonOrder, CommonResult, CommonPatient, Header, Terminator
 
-from getresults.astm.dispatchers import GetResultsDispatcher
+from getresults.astm import GetResultsDispatcher, emitter
 from getresults.models import (
-    Result, ResultItem, Panel, PanelItem, Utestid, Order, Sender, UtestidMapping)
+    Result, ResultItem, Panel, PanelItem, Utestid, Order, Sender, UtestidMapping,
+    AstmQuery)
 from getresults_aliquot.models import Aliquot, AliquotType
 from getresults_receive.models import Patient, Receive
 from getresults.utils import (
@@ -463,3 +464,51 @@ class TestAstm(TestCase):
             panel=panel,
             utestid=utestid,
         )
+
+    def test_emit_with_no_data(self):
+        AstmQuery.objects.create(
+            patient_identifier='patient_id',
+            aliquot_identifier='aliquot_identifier'
+        )
+        e = emitter()
+        h = next(e)
+        self.assertIsInstance(h, Header)
+        p = next(e)
+        self.assertIsInstance(p, CommonPatient)
+        self.assertEqual(p.practice_id, 'patient_id')
+
+    def test_emit_with_data(self):
+        patient_identifier = 'P12345678'
+        aliquot_identifier = 'A23456789012345'
+        AstmQuery.objects.create(
+            patient_identifier=patient_identifier,
+            aliquot_identifier=aliquot_identifier
+        )
+        patient = Patient.objects.create(
+            patient_identifier=patient_identifier,
+            registration_datetime=timezone.now())
+        receive = Receive.objects.create(
+            patient=patient,
+            receive_datetime=timezone.now())
+        aliquot_type = AliquotType.objects.create(alpha_code='WB', numeric_code='02')
+        aliquot = Aliquot.objects.create(
+            receive=receive,
+            aliquot_identifier=aliquot_identifier,
+            aliquot_type=aliquot_type,
+        )
+        panel = Panel.objects.create(name='CHEM')
+        order = Order.objects.create(
+            order_identifier='O123456789',
+            order_datetime=timezone.now(),
+            panel=panel,
+            aliquot=aliquot)
+        e = emitter()
+        h = next(e)
+        self.assertIsInstance(h, Header)
+        p = next(e)
+        self.assertIsInstance(p, CommonPatient)
+        self.assertEqual(p.practice_id, patient_identifier)
+        o = next(e)
+        self.assertIsInstance(o, CommonOrder)
+        l = next(e)
+        self.assertIsInstance(l, Terminator)
