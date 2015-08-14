@@ -1,10 +1,8 @@
 import pytz
 
-from uuid import uuid4
-
 from django.conf import settings
-from django.utils import timezone
-
+from django.db import IntegrityError
+from getresults_aliquot.exceptions import AliquotError
 from getresults_aliquot.models import AliquotType, Aliquot, AliquotCondition
 from getresults_astm.dispatcher import Dispatcher
 from getresults_receive.models import Patient, Receive
@@ -31,7 +29,8 @@ class GetResultsDispatcher(Dispatcher):
     def new_record_event(self, records):
         self.save_to_db(records)
 
-    def save_to_db(self, records):
+    def save_to_db(self, records, raise_exceptions=None):
+        raise_exceptions = True if raise_exceptions is None else False
         try:
             header_record = records['H']
             sender = self.sender(
@@ -49,7 +48,11 @@ class GetResultsDispatcher(Dispatcher):
                 order_record = records['O']
                 panel = self.panel(order_record.test)
                 receive = self.receive(
-                    patient, order_record.sample_id, order_record.sampled_at, order_record.created_at)
+                    patient,
+                    order_record.sample_id,
+                    order_record.sampled_at or order_record.created_at,
+                    order_record.created_at
+                )
                 order = self.order(
                     order_record.sample_id,
                     order_record.created_at,
@@ -83,11 +86,30 @@ class GetResultsDispatcher(Dispatcher):
                             panel_item = self.panel_item(panel, utestid)
                             self.result_item(result, utestid, panel_item, None)
         except AttributeError as err:
+            if raise_exceptions:
+                raise AttributeError(err)
+            print(str(err))
+        except ValueError as err:
+            if raise_exceptions:
+                raise ValueError(err)
+            print(str(err))
+        except AliquotError as err:
+            if raise_exceptions:
+                raise AliquotError(err)
+            print(str(err))
+        except IntegrityError as err:
+            if raise_exceptions:
+                raise IntegrityError(err)
             print(str(err))
         except Exception as err:
+            if raise_exceptions:
+                raise Exception(err)
             print(str(err))
 
     def sender(self, sender_name, sender_description):
+        """Gets and returns a sender record.
+
+        Creates a sender record if it does not exist."""
         try:
             sender = Sender.objects.get(name=sender_name)
         except Sender.DoesNotExist:
@@ -97,6 +119,9 @@ class GetResultsDispatcher(Dispatcher):
         return sender
 
     def patient(self, patient_identifier, gender, dob, registration_datetime):
+        """Gets and returns a patient record.
+
+        Creates a patient record if create_dummy_records = True."""
         try:
             patient = Patient.objects.get(patient_identifier=patient_identifier)
         except Patient.DoesNotExist:
@@ -111,6 +136,9 @@ class GetResultsDispatcher(Dispatcher):
         return patient
 
     def panel(self, name):
+        """Gets and returns a Panel record.
+
+        Creates a Panel record if create_dummy_records = True."""
         try:
             panel = Panel.objects.get(name=name)
         except Panel.DoesNotExist:
@@ -118,6 +146,9 @@ class GetResultsDispatcher(Dispatcher):
         return panel
 
     def order(self, order_identifier, order_datetime, action_code, report_type, panel, receive):
+        """Gets and returns a Order record.
+
+        Creates a Order record if create_dummy_records = True."""
         try:
             order = Order.objects.get(order_identifier=order_identifier)
         except Order.DoesNotExist:
@@ -135,7 +166,9 @@ class GetResultsDispatcher(Dispatcher):
         return order
 
     def aliquot(self, receive, order_identifier):
-        """Creates a fake aliquot."""
+        """Gets and returns an aliquot record.
+
+        Will create a primary if create_dummy_records is True."""
         try:
             aliquot_type = AliquotType.objects.get(name='unknown')
         except AliquotType.DoesNotExist:
@@ -155,7 +188,9 @@ class GetResultsDispatcher(Dispatcher):
         return aliquot
 
     def receive(self, patient, receive_identifier, collection_datetime, receive_datetime):
-        """Creates a fake receive record."""
+        """Gets and returns a Receive record.
+
+        Creates a Receive record if create_dummy_records = True."""
         try:
             receive = Receive.objects.get(
                 receive_identifier=receive_identifier,
@@ -172,6 +207,9 @@ class GetResultsDispatcher(Dispatcher):
         return receive
 
     def result(self, result_identifier, order, specimen_identifier, operator, status, instrument):
+        """Gets and returns a Result record.
+
+        Creates a Result record if create_dummy_records = True."""
         try:
             result = Result.objects.get(order=order)
         except Result.DoesNotExist:
