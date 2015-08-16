@@ -10,4 +10,5 @@ astm
 -e git+https://github.com/botswana-harvard/getresults-order@develop#egg=getresults_order
 -e git+https://github.com/botswana-harvard/getresults-result@develop#egg=getresults_result
 -e git+https://github.com/botswana-harvard/getresults-identifier@develop#egg=getresults_identifier
+-e git+https://github.com/botswana-harvard/getresults-astm@develop#egg=getresults_astm
 -e git+https://github.com/botswana-harvard/edc-base@develop#egg=edc_base
