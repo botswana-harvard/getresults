@@ -5,9 +5,10 @@ from django.db import IntegrityError
 from getresults_aliquot.exceptions import AliquotError
 from getresults_aliquot.models import AliquotType, Aliquot, AliquotCondition
 from getresults_astm.dispatcher import Dispatcher
-from getresults_receive.models import Patient, Receive
-
-from ..models import Panel, PanelItem, Order, Result, ResultItem, Utestid, UtestidMapping, Sender
+from getresults_receive.models import Receive
+from getresults_patient.models import Patient
+from getresults_order.models import Panel, PanelItem, Order, Utestid, UtestidMapping, Sender
+from getresults_result.models import Result, ResultItem
 
 tz = pytz.timezone(settings.TIME_ZONE)
 

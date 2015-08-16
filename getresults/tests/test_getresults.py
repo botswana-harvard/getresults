@@ -1,7 +1,9 @@
 import math
+
 from django.test import TestCase
 
-from ..models import Panel, PanelItem, Utestid
+from getresults_order.models import Panel, PanelItem, Utestid
+
 from ..utils import (
     load_panel_items_from_csv, load_utestids_from_csv, load_panels_from_csv, load_utestidmappings_from_csv
 )

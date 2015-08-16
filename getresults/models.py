@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
+from getresults_identifier.models import BaseIdentifierHistory
+
 
 class AstmQuery(models.Model):
 
@@ -18,6 +20,12 @@ class AstmQuery(models.Model):
 
     sent = models.BooleanField(
         default=False)
+
+    class Meta:
+        app_label = 'getresults'
+
+
+class IdentifierHistory(BaseIdentifierHistory):
 
     class Meta:
         app_label = 'getresults'

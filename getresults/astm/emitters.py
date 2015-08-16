@@ -1,14 +1,17 @@
 import pytz
-from datetime import datetime
+# from datetime import datetime
 
 from django.conf import settings
 from django.utils import timezone
 
 from getresults_astm.records import Header, CommonPatient, OrderRecord, ResultRecord, TerminatorRecord
 
-from getresults_receive.models import Receive
+# from getresults_receive.models import Receive
 from getresults_aliquot.models import Aliquot
-from getresults.models import Order, Result, ResultItem, AstmQuery
+from getresults_order.models import Order
+from getresults_result.models import Result, ResultItem
+
+from ..models import AstmQuery
 
 from getresults.version import __version__
 
@@ -35,7 +38,7 @@ def emitter():
             for order in Order.objects.filter(aliquot=aliquot):
                 yield OrderRecord()
                 for result in Result.objects.filter(order=order):
-                    for result_item in ResultItem.objects.filter(result=result):
+                    for _ in ResultItem.objects.filter(result=result):
                         yield ResultRecord()
         except Aliquot.DoesNotExist:
             yield patient(astm_query.patient_identifier, timezone.now())

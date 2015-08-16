@@ -40,6 +40,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'getresults_aliquot',
     'getresults_receive',
+    'getresults_patient',
+    'getresults_result',
     'getresults',
 )
 

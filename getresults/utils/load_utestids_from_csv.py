@@ -3,7 +3,7 @@ import os
 
 from django.conf import settings
 
-from ..models import Utestid
+from getresults_order.models import Utestid
 
 
 def load_utestids_from_csv(csv_filename=None):

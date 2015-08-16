@@ -1,15 +1,8 @@
-import time
-
-from .base_functional_tests import BaseFunctionalTest
+from .base_selenium_test import BaseSeleniumTest
 
 
-class TestInterface(BaseFunctionalTest):
+class TestInterface(BaseSeleniumTest):
 
-    def test_login(self):
-        # Only authorized users can access the system
-        self.browser.get(self.live_server_url)
-        self.browser.find_element_by_id('username').send_keys(self.username)
-        self.browser.find_element_by_id('password').send_keys(self.password)
-        self.browser.find_element_by_id('login').click()
-        time.sleep(1)
-        # self.assertIn('receive', self.browser.title.lower())
+    def test_admin(self):
+        self.navigate_to_admin()
+        self.login()

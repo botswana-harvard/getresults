@@ -13,11 +13,12 @@ from astm.constants import ENCODING
 from getresults_astm.records import CommonOrder, CommonResult, CommonPatient, Header, Terminator
 
 from getresults.astm import GetResultsDispatcher, emitter
-from getresults.models import (
-    Result, ResultItem, Panel, PanelItem, Utestid, Order, Sender, UtestidMapping,
-    AstmQuery)
+from getresults.models import AstmQuery
+from getresults_order.models import Panel, PanelItem, Utestid, Order, UtestidMapping
+from getresults_result.models import Result, ResultItem
 from getresults_aliquot.models import Aliquot, AliquotType
-from getresults_receive.models import Patient, Receive
+from getresults_receive.models import Receive
+from getresults_patient.models import Patient
 from getresults.utils import (
     load_panel_items_from_csv, load_utestids_from_csv, load_panels_from_csv
 )

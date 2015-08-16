@@ -3,7 +3,7 @@ import os
 
 from django.conf import settings
 
-from ..models import UtestidMapping, Sender, Utestid, Panel
+from getresults_order.models import UtestidMapping, Sender, Utestid, Panel
 
 
 def load_utestidmappings_from_csv(csv_filename=None, header_fields=None):

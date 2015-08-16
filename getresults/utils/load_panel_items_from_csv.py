@@ -3,7 +3,7 @@ import os
 
 from django.conf import settings
 
-from ..models import Panel, Utestid, PanelItem
+from getresults_order.models import Panel, Utestid, PanelItem
 
 
 def load_panel_items_from_csv(csv_filename=None):
