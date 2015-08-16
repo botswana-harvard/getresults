@@ -13,6 +13,10 @@ from getresults_result.models import Result, ResultItem
 tz = pytz.timezone(settings.TIME_ZONE)
 
 
+class AstmError(Exception):
+    pass
+
+
 class GetResultsDispatcher(Dispatcher):
 
     """Dispatches data to the getresults DB coming in from analyzers/Roche PSM.
@@ -86,25 +90,9 @@ class GetResultsDispatcher(Dispatcher):
                             utestid = Utestid.objects.get(name=name)
                             panel_item = self.panel_item(panel, utestid)
                             self.result_item(result, utestid, panel_item, None)
-        except AttributeError as err:
+        except (AttributeError, ValueError, AliquotError, IntegrityError, Exception) as err:
             if raise_exceptions:
-                raise AttributeError(err)
-            print(str(err))
-        except ValueError as err:
-            if raise_exceptions:
-                raise ValueError(err)
-            print(str(err))
-        except AliquotError as err:
-            if raise_exceptions:
-                raise AliquotError(err)
-            print(str(err))
-        except IntegrityError as err:
-            if raise_exceptions:
-                raise IntegrityError(err)
-            print(str(err))
-        except Exception as err:
-            if raise_exceptions:
-                raise Exception(err)
+                raise AstmError(err)
             print(str(err))
 
     def sender(self, sender_name, sender_description):

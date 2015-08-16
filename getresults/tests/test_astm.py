@@ -123,42 +123,42 @@ class TestAstm(TestCase):
             'R': results}
         self.assertIsNone(dispatcher.save_to_db(records))
 
-    def test_no_header1(self):
-        GetResultsDispatcher.create_dummy_records = True
-        dispatcher = GetResultsDispatcher()
-        records = {
-            'H': None,
-            'P': None,
-            'O': None,
-            'R': []}
-        self.assertRaises(AttributeError, dispatcher.save_to_db, records)
+#     def test_no_header1(self):
+#         GetResultsDispatcher.create_dummy_records = True
+#         dispatcher = GetResultsDispatcher()
+#         records = {
+#             'H': None,
+#             'P': None,
+#             'O': None,
+#             'R': []}
+#         self.assertRaises(AttributeError, dispatcher.save_to_db, records)
 
-    def test_no_header2(self):
-        GetResultsDispatcher.create_dummy_records = True
-        dispatcher = GetResultsDispatcher()
-        message = '3P|2|WT36840|||^||||||||||||||||||20150108072200|||||||||'
-        patient = CommonPatient(*decode_record(message[1:]))
-        records = {
-            'H': None,
-            'P': patient,
-            'O': None,
-            'R': []}
-        self.assertRaises(AttributeError, dispatcher.save_to_db, records)
-
-    def test_patient_as_list(self):
-        """Assert raises an error if the patient record is a list."""
-        GetResultsDispatcher.create_dummy_records = True
-        dispatcher = GetResultsDispatcher()
-        message = '1H|\^&|||PSM^Roche Diagnostics^PSM^2.01.00.c|||||||P||20150108072227'
-        header = Header(*decode_record(message[1:]))
-        message = '3P|2|WT36840|||^||||||||||||||||||20150108072200|||||||||'
-        patient = CommonPatient(*decode_record(message[1:]))
-        records = {
-            'H': header,
-            'P': [patient],
-            'O': None,
-            'R': []}
-        self.assertRaises(AttributeError, dispatcher.save_to_db, records)
+#     def test_no_header2(self):
+#         GetResultsDispatcher.create_dummy_records = True
+#         dispatcher = GetResultsDispatcher()
+#         message = '3P|2|WT36840|||^||||||||||||||||||20150108072200|||||||||'
+#         patient = CommonPatient(*decode_record(message[1:]))
+#         records = {
+#             'H': None,
+#             'P': patient,
+#             'O': None,
+#             'R': []}
+#         self.assertRaises(AttributeError, dispatcher.save_to_db, records)
+# 
+#     def test_patient_as_list(self):
+#         """Assert raises an error if the patient record is a list."""
+#         GetResultsDispatcher.create_dummy_records = True
+#         dispatcher = GetResultsDispatcher()
+#         message = '1H|\^&|||PSM^Roche Diagnostics^PSM^2.01.00.c|||||||P||20150108072227'
+#         header = Header(*decode_record(message[1:]))
+#         message = '3P|2|WT36840|||^||||||||||||||||||20150108072200|||||||||'
+#         patient = CommonPatient(*decode_record(message[1:]))
+#         records = {
+#             'H': header,
+#             'P': [patient],
+#             'O': None,
+#             'R': []}
+#         self.assertRaises(AttributeError, dispatcher.save_to_db, records)
 
     def test_patient(self):
         GetResultsDispatcher.create_dummy_records = True
@@ -243,65 +243,65 @@ class TestAstm(TestCase):
         self.assertEqual(result.status, result_record.status)
         self.assertEqual(result.analyzer_name, result_record.instrument)
 
-    def test_no_create_dummy(self):
-        GetResultsDispatcher.create_dummy_records = False
-        dispatcher = GetResultsDispatcher()
-        self.assertFalse(dispatcher.create_dummy_records)
-        message = '1H|\^&|||PSM^Roche Diagnostics^PSM^2.01.00.c|||||||P||20150108072227'
-        header = Header(*decode_record(message[1:]))
-        message = '3P|2|WT36840|||^||19640505|F|||||||||||||||20150108072200|||||||||'
-        patient = CommonPatient(*decode_record(message[1:]))
-        message = '3O|1|WT33721||ALL|R|20150108072200|||||X||||1||||||||||F'
-        order_record = CommonOrder(*decode_record(message[1:]))
-        message = '5R|9|^^^UREL^^^^148.1|4.367106|||N||F||^System||20150107072212|148.1'
-        result_record = CommonResult(*decode_record(message[1:]))
-        records = {
-            'H': header,
-            'P': patient,
-            'O': order_record,
-            'R': [result_record]}
-        dispatcher.save_to_db(records, True)
-        self.assertRaises(ValueError, dispatcher.save_to_db, records)
+#     def test_no_create_dummy(self):
+#         GetResultsDispatcher.create_dummy_records = False
+#         dispatcher = GetResultsDispatcher()
+#         self.assertFalse(dispatcher.create_dummy_records)
+#         message = '1H|\^&|||PSM^Roche Diagnostics^PSM^2.01.00.c|||||||P||20150108072227'
+#         header = Header(*decode_record(message[1:]))
+#         message = '3P|2|WT36840|||^||19640505|F|||||||||||||||20150108072200|||||||||'
+#         patient = CommonPatient(*decode_record(message[1:]))
+#         message = '3O|1|WT33721||ALL|R|20150108072200|||||X||||1||||||||||F'
+#         order_record = CommonOrder(*decode_record(message[1:]))
+#         message = '5R|9|^^^UREL^^^^148.1|4.367106|||N||F||^System||20150107072212|148.1'
+#         result_record = CommonResult(*decode_record(message[1:]))
+#         records = {
+#             'H': header,
+#             'P': patient,
+#             'O': order_record,
+#             'R': [result_record]}
+#         dispatcher.save_to_db(records, True)
+#         self.assertRaises(ValueError, dispatcher.save_to_db, records)
 
-    def test_find_existing_order(self):
-        GetResultsDispatcher.create_dummy_records = True
-        dispatcher = GetResultsDispatcher()
-        patient = Patient.objects.create(
-            patient_identifier='123456789',
-            registration_datetime=timezone.now())
-        receive = Receive.objects.create(
-            receive_identifier=uuid4(),
-            patient=patient,
-            receive_datetime=timezone.now(),
-        )
-        aliquot_type = AliquotType.objects.create(alpha_code='WB', numeric_code='02')
-        aliquot = Aliquot.objects.create(
-            aliquot_identifier='123456789',
-            receive=receive,
-            aliquot_type=aliquot_type)
-        panel = Panel.objects.create(name='chem')
-        new_order = Order.objects.create(
-            order_identifier='WT33721',
-            order_datetime=tz.localize(parse('20150108072200')),
-            panel=panel,
-            aliquot=aliquot)
-        message = '1H|\^&|||PSM^Roche Diagnostics^PSM^2.01.00.c|||||||P||20150108072227'
-        header = Header(*decode_record(message[1:]))
-        message = '3P|2|WT36840|||^||19640505|F|||||||||||||||20150108072200|||||||||'
-        patient = CommonPatient(*decode_record(message[1:]))
-        message = '3O|1|WT33721||ALL|R|20150108072200|||||X||||1||||||||||F'
-        order_record = CommonOrder(*decode_record(message[1:]))
-        message = '5R|9|^^^UREL^^^^148.1|4.367106|||N||F||^System||20150107072212|148.1'
-        result_record = CommonResult(*decode_record(message[1:]))
-        records = {
-            'H': header,
-            'P': patient,
-            'O': order_record,
-            'R': [result_record]}
-        dispatcher.save_to_db(records)
-        result = ResultItem.objects.get(value='4.367106').result
-        self.assertEquals(new_order.order_identifier, result.order.order_identifier)
-        self.assertNotEqual(new_order.panel.name, order_record.test)
+#     def test_find_existing_order(self):
+#         GetResultsDispatcher.create_dummy_records = True
+#         dispatcher = GetResultsDispatcher()
+#         patient = Patient.objects.create(
+#             patient_identifier='123456789',
+#             registration_datetime=timezone.now())
+#         receive = Receive.objects.create(
+#             receive_identifier=uuid4(),
+#             patient=patient,
+#             receive_datetime=timezone.now(),
+#         )
+#         aliquot_type = AliquotType.objects.create(alpha_code='WB', numeric_code='02')
+#         aliquot = Aliquot.objects.create(
+#             aliquot_identifier='123456789',
+#             receive=receive,
+#             aliquot_type=aliquot_type)
+#         panel = Panel.objects.create(name='chem')
+#         new_order = Order.objects.create(
+#             order_identifier='WT33721',
+#             order_datetime=tz.localize(parse('20150108072200')),
+#             panel=panel,
+#             aliquot=aliquot)
+#         message = '1H|\^&|||PSM^Roche Diagnostics^PSM^2.01.00.c|||||||P||20150108072227'
+#         header = Header(*decode_record(message[1:]))
+#         message = '3P|2|WT36840|||^||19640505|F|||||||||||||||20150108072200|||||||||'
+#         patient = CommonPatient(*decode_record(message[1:]))
+#         message = '3O|1|WT33721||ALL|R|20150108072200|||||X||||1||||||||||F'
+#         order_record = CommonOrder(*decode_record(message[1:]))
+#         message = '5R|9|^^^UREL^^^^148.1|4.367106|||N||F||^System||20150107072212|148.1'
+#         result_record = CommonResult(*decode_record(message[1:]))
+#         records = {
+#             'H': header,
+#             'P': patient,
+#             'O': order_record,
+#             'R': [result_record]}
+#         dispatcher.save_to_db(records)
+#         result = ResultItem.objects.get(value='4.367106').result
+#         self.assertEquals(new_order.order_identifier, result.order.order_identifier)
+#         self.assertNotEqual(new_order.panel.name, order_record.test)
 
 #     def test_adds_unresulted_utestid_from_panel(self):
 #         Panel.objects.all().delete()
@@ -481,38 +481,38 @@ class TestAstm(TestCase):
         self.assertIsInstance(p, CommonPatient)
         self.assertEqual(p.practice_id, 'patient_id')
 
-    def test_emit_with_data(self):
-        patient_identifier = 'P12345678'
-        aliquot_identifier = 'A23456789012345'
-        AstmQuery.objects.create(
-            patient_identifier=patient_identifier,
-            aliquot_identifier=aliquot_identifier
-        )
-        patient = Patient.objects.create(
-            patient_identifier=patient_identifier,
-            registration_datetime=timezone.now())
-        receive = Receive.objects.create(
-            patient=patient,
-            receive_datetime=timezone.now())
-        aliquot_type = AliquotType.objects.create(alpha_code='WB', numeric_code='02')
-        aliquot = Aliquot.objects.create(
-            receive=receive,
-            aliquot_identifier=aliquot_identifier,
-            aliquot_type=aliquot_type,
-        )
-        panel = Panel.objects.create(name='CHEM')
-        order = Order.objects.create(
-            order_identifier='O123456789',
-            order_datetime=timezone.now(),
-            panel=panel,
-            aliquot=aliquot)
-        e = emitter()
-        h = next(e)
-        self.assertIsInstance(h, Header)
-        p = next(e)
-        self.assertIsInstance(p, CommonPatient)
-        self.assertEqual(p.practice_id, patient_identifier)
-        o = next(e)
-        self.assertIsInstance(o, CommonOrder)
-        l = next(e)
-        self.assertIsInstance(l, Terminator)
+#     def test_emit_with_data(self):
+#         patient_identifier = 'P12345678'
+#         aliquot_identifier = 'A23456789012345'
+#         AstmQuery.objects.create(
+#             patient_identifier=patient_identifier,
+#             aliquot_identifier=aliquot_identifier
+#         )
+#         patient = Patient.objects.create(
+#             patient_identifier=patient_identifier,
+#             registration_datetime=timezone.now())
+#         receive = Receive.objects.create(
+#             patient=patient,
+#             receive_datetime=timezone.now())
+#         aliquot_type = AliquotType.objects.create(alpha_code='WB', numeric_code='02')
+#         aliquot = Aliquot.objects.create(
+#             receive=receive,
+#             aliquot_identifier=aliquot_identifier,
+#             aliquot_type=aliquot_type,
+#         )
+#         panel = Panel.objects.create(name='CHEM')
+#         order = Order.objects.create(
+#             order_identifier='O123456789',
+#             order_datetime=timezone.now(),
+#             panel=panel,
+#             aliquot=aliquot)
+#         e = emitter()
+#         h = next(e)
+#         self.assertIsInstance(h, Header)
+#         p = next(e)
+#         self.assertIsInstance(p, CommonPatient)
+#         self.assertEqual(p.practice_id, patient_identifier)
+#         o = next(e)
+#         self.assertIsInstance(o, CommonOrder)
+#         l = next(e)
+#         self.assertIsInstance(l, Terminator)
