@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'getresults_aliquot',
     'getresults_receive',
     'getresults_patient',
+    'getresults_order',
     'getresults_result',
     'getresults',
 )
