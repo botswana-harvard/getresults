@@ -2,7 +2,7 @@ import sys
 
 from django.core.management.base import BaseCommand
 
-from getresults.astm.dispatchers import GetResultsDispatcher as Dispatcher
+from getresults_astm.getresults.dispatchers import GetResultsDispatcher as Dispatcher
 from astm.server import Server
 
 
