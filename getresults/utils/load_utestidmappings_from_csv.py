@@ -3,7 +3,7 @@ import os
 
 from django.conf import settings
 
-from getresults_order.models import UtestidMapping, Sender, Utestid, Panel
+from getresults_order.models import SenderPanelMapping, Sender, Utestid, SenderPanel
 
 
 def load_utestidmappings_from_csv(csv_filename=None, header_fields=None):
@@ -28,21 +28,21 @@ def load_utestidmappings_from_csv(csv_filename=None, header_fields=None):
         for row in reader:
             r = dict(zip(header, row))
             try:
-                panel = Panel.objects.get(name=r['panel_name'].strip().lower())
+                panel = SenderPanel.objects.get(name=r['panel_name'].strip().lower())
                 utestid = Utestid.objects.get(name=r['utestid_name'].strip().lower())
-                UtestidMapping.objects.get(
+                SenderPanelMapping.objects.get(
                     sender=sender(r['sender']),
                     sender_utestid_name=r['sender_utestid_name'].strip().lower(),
                     panel=panel,
                 )
-            except UtestidMapping.DoesNotExist:
-                UtestidMapping.objects.create(
+            except SenderPanelMapping.DoesNotExist:
+                SenderPanelMapping.objects.create(
                     sender=sender(r['sender']),
                     utestid=utestid,
                     sender_utestid_name=r['sender_utestid_name'].strip().lower(),
                     panel=panel,
                 )
-            except (Utestid.DoesNotExist, Panel.DoesNotExist) as e:
+            except (Utestid.DoesNotExist, SenderPanel.DoesNotExist) as e:
                 raise ValueError(
                     '{}. Try importing or creating this item before importing this CSV file. Got {}'.format(
                         str(e),

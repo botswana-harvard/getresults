@@ -17,15 +17,20 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from getresults.admin import admin_site
-from getresults.views import HomeView, login_view, logout_view
+from getresults.views import HomeView, LoginView, LogoutView
+from getresults_result import urls as getresults_result_urls
+from getresults_csv import urls as getresults_csv_urls
 
 admin.autodiscover()
 
 urlpatterns = [
+    url(r'^admin/logout/', LogoutView.as_view(url='/login/')),
+    url(r'^login/', LoginView.as_view(), name='login_url'),
+    url(r'^logout/', LogoutView.as_view(url='/login/'), name='logout_url'),
     url(r'^admin/', include(admin_site.urls)),
-    url(r'^accounts/login/', login_view),
-    url(r'^login/', login_view, name='login_url'),
-    url(r'^logout/', logout_view, name='logout_url'),
+    url(r'^accounts/login/', LoginView.as_view()),
     url(r'^home/', HomeView.as_view(), name='home'),
+    url(r'^result/import/', include(getresults_csv_urls), name='import_url'),
+    url(r'^result/', include(getresults_result_urls), name='result_url'),
     url(r'', HomeView.as_view(), name='default'),
 ]

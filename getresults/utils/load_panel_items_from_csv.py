@@ -3,7 +3,7 @@ import os
 
 from django.conf import settings
 
-from getresults_order.models import Panel, Utestid, PanelItem
+from getresults_order.models import OrderPanel, Utestid, OrderPanelItem
 
 
 def load_panel_items_from_csv(csv_filename=None):
@@ -15,12 +15,12 @@ def load_panel_items_from_csv(csv_filename=None):
         panel = None
         for row in reader:
             r = dict(zip(header, row))
-            panel = Panel.objects.get(name=r['panel_name'].strip().lower())
+            panel = OrderPanel.objects.get(name=r['panel_name'].strip().lower())
             utestid = Utestid.objects.get(name=r['utestid'].strip().lower())
             try:
-                PanelItem.objects.get(panel=panel, utestid=utestid)
-            except PanelItem.DoesNotExist:
-                PanelItem.objects.create(
+                OrderPanelItem.objects.get(panel=panel, utestid=utestid)
+            except OrderPanelItem.DoesNotExist:
+                OrderPanelItem.objects.create(
                     panel=panel,
                     utestid=utestid,
                 )

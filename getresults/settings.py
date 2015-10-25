@@ -38,12 +38,15 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crispy_forms',
     'getresults_identifier',
-    'getresults_aliquot',
-    'getresults_receive',
     'getresults_patient',
-    'getresults_order',
+    'getresults_receive',
+    'getresults_aliquot',
     'getresults_result',
+    'getresults_order',
+    'getresults_sender',
+    'getresults_csv',
     'getresults',
 )
 
@@ -125,3 +128,8 @@ RECEIVE_IDENTIFIER_ALPHA_PATTERN = r'^[A-Z]{2}$'
 RECEIVE_IDENTIFIER_NUMERIC_PATTERN = r'^[0-9]{5}$'
 
 ALIQUOT_IDENTIFIER_PREFIX_PATTERN = RECEIVE_IDENTIFIER_ALPHA_PATTERN[1:-1] + RECEIVE_IDENTIFIER_NUMERIC_PATTERN[1:-1]
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+CSV_FILE_PATH = '~/interface/cd4/'
+CSV_FILE_EXT = (['*.csv'], '\.csv$')
