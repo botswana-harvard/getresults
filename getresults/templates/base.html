@@ -43,6 +43,12 @@
     <script src="{%static "js/active.js" %}"></script>
 
 {% endblock scripts %}
+
+{% block extra_scripts%}
+    <script src="{%static "js/getresults_result.js" %}"></script>
+{% endblock extra_scripts%}
+
+
 {% endblock header %}
 
 <body>
@@ -71,9 +77,11 @@
             <li><a title="user profile" href="/user_profile/">{{ user.username }}</a></li>
             <li><a title="logout" href="/logout/"><span class="glyphicon glyphicon-log-out"></span></a></li>
           </ul>
-          <form class="navbar-form navbar-right">
-            <input type="text" class="form-control" placeholder="Search...">
+          {% block topbar_search %}
+          <form class="navbar-form navbar-right" action="{{request.path}}" method="GET">
+            <input type="text" class="form-control" placeholder="Search..." id="search" name="search">
           </form>
+          {% endblock topbar_search %}
         </div>
       </div>
     </nav>

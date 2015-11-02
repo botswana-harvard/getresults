@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 
+
+
 {% block main %}
     <div class="container-fluid">
       <div class="row">
@@ -10,23 +12,34 @@
             <li><a href="#">Reports</a></li>
             <li><a href="#">Analytics</a></li>
           </ul>
+
           {% block section_sidebar %}
 	          <!-- extend the sidebar with an additional UL as above -->
           {%endblock section_sidebar%}
+
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-sm-offset-2 main">
         	<div class="row placeholders">
+
 	        {% block section_labels%}
 	        	<!-- a row of section labels at the top below the navbar in the body -->
 	        {% endblock section_labels %}
             </div>
             
 		{% block section_body %}
+
+			{% block section_message %}
+				{% if success_message %}
+					{{ success_message }}
+				{% endif %}
+			{% endblock section_message %}	
+
 			{% block section_body_title %}<h3 class="sub-header">{{ section_title }}</h3>{% endblock section_body_title %}
 			<div class="table-responsive">
 			{% block section_body_one %}{% endblock section_body_one %}
 			{% block section_body_two %}{% endblock section_body_two %}
 			{% block section_body_three %}{% endblock section_body_three %}
+
 			{% block section_body_table %}
 			    <table class="table table-striped">
 			    <thead>
@@ -37,31 +50,33 @@
 			    </tbody>
 			</table>
 			{% endblock section_body_table %}
+
 			{% block section_body_paginator %}
-			{% if is_paginated %}
-			    <div class="pagination">
-			        <span class="page-links">
-			           	{% if page_obj.has_previous %}
-			            	<a href="{{ request.path }}?page=1"><span class="glyphicon glyphicon-fast-backward"></span></a>
-			                <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}"><span class="glyphicon glyphicon-step-backward"></span></a>
-			            {% else %}
-			            	<a><span class="glyphicon glyphicon-fast-backward text-muted"></span></a>
-			                <a><span class="glyphicon glyphicon-step-backward text-muted"></span></a>
-			            {% endif %}
-			            	<span class="page-current">
-			                	Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-			            	</span>
-			            {% if page_obj.has_next %}
-							<a href="{{ request.path }}?page={{ page_obj.next_page_number }}"><span class="glyphicon glyphicon-step-forward"></span></a>
-							<a href="{{ request.path }}?page=last"><span class="glyphicon glyphicon-fast-forward"></span></a>
-					    {% else %}
-							<a><span class="glyphicon glyphicon-step-forward text-muted"></span></a>
-							<a><span class="glyphicon glyphicon-fast-forward text-muted"></span></a>
-					    {% endif %}
-			        </span>
-			    </div>
-		    {% endif %}
+				{% if is_paginated %}
+				    <div class="pagination">
+				        <span class="page-links">
+				           	{% if page_obj.has_previous %}
+				            	<a href="{{ request.path }}?page=1"><span class="glyphicon glyphicon-fast-backward"></span></a>
+				                <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}"><span class="glyphicon glyphicon-step-backward"></span></a>
+				            {% else %}
+				            	<a><span class="glyphicon glyphicon-fast-backward text-muted"></span></a>
+				                <a><span class="glyphicon glyphicon-step-backward text-muted"></span></a>
+				            {% endif %}
+				            	<span class="page-current">
+				                	Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+				            	</span>
+				            {% if page_obj.has_next %}
+								<a href="{{ request.path }}?page={{ page_obj.next_page_number }}"><span class="glyphicon glyphicon-step-forward"></span></a>
+								<a href="{{ request.path }}?page=last"><span class="glyphicon glyphicon-fast-forward"></span></a>
+						    {% else %}
+								<a><span class="glyphicon glyphicon-step-forward text-muted"></span></a>
+								<a><span class="glyphicon glyphicon-fast-forward text-muted"></span></a>
+						    {% endif %}
+				        </span>
+				    </div>
+			    {% endif %}
 		    {% endblock section_body_paginator %}
+
 		     </div>
 		{% endblock section_body %}
 

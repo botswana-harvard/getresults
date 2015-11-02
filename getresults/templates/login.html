@@ -8,7 +8,14 @@
       <h1>LIS Login</h1>
       <hr/>
       <div class="well">
-      	{% csrf_token %}
+		{% if messages %}
+		<ul class="messages">
+		    {% for message in messages %}
+		    	<li class="list-group-item-danger"><strong>{{ message }}</strong></li>
+		    {% endfor %}
+		</ul>
+		{% endif %}
+		{% csrf_token %}
         {% crispy form %}
       </div>
     </div>

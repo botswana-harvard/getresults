@@ -1,0 +1,8 @@
+#batchModal .modal-dialog {
+	width: 95%;
+	height: 85%;
+}
+
+#batchModal .modal-body {
+	margin-left: 20px;
+}
